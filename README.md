@@ -1,2 +1,2 @@
 # MyHackerRankSolutions
-There is some of my HackerRankSolutions
+There are some of my HackerRankSolutions
