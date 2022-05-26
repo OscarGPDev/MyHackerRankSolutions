@@ -1,5 +1,5 @@
 function isBalanced(s) {
-    // Write your code here
+
     const bracketsType = {
         parenthesisOpen: '(',
         parenthesisClose: ')',
@@ -9,6 +9,7 @@ function isBalanced(s) {
         squareBracketClose: ']',
     }
 
+    // I keep things simple, I've encapsulated the main operations inside this class, so the main algorithm is simple
     class BracketsBalancer {
         constructor() {
             this.brackets = [];
@@ -84,7 +85,7 @@ function isBalanced(s) {
     }
     if (result !== "NO" && factory.isEmptyStack()) {
         result = "YES";
-    }else {
+    } else {
         result = "NO";
     }
     return result;
