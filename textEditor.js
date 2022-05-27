@@ -25,12 +25,13 @@ const textEditor = (input) => {
         }
 
         append(d) {
+            //Even if there is only needed to save the length of the inserted data, I prefer to save the inserted data for consistency
             this.operations.push({operation: operation.append, data: d});
             this.data += d;
         }
 
         delete(k) {
-            this.operations.push({operation: operation.delete, data: this.data.substring(this.data.length - 1 - k)})
+            this.operations.push({operation: operation.delete, data: this.data.substring(this.data.length - k)})
             this.data = this.data.substring(0, this.data.length - k);
         }
 
@@ -83,7 +84,7 @@ const testCases = [`8
 4
 4
 3 1`,
-`50
+    `50
 1 zsfncpxdzl
 3 4
 3 6
@@ -137,7 +138,7 @@ const testCases = [`8
 const expectedOutputs = [`c
 y
 a`,
-`n
+    `n
 p
 x
 s
