@@ -16,13 +16,16 @@ function checkMagazine(magazine, note) {
         const reps = noteParts.get(word) || 0;
         noteParts.set(word, reps + 1)
     })
-    magazine.forEach(word => {
+    magazine.find(word => {
         const reps = noteParts.get(word) || 0
         if (reps > 0 && reps - 1 > 0) {
             noteParts.set(word, reps - 1)
         }
         if (reps > 0 && reps - 1 === 0) {
             noteParts.delete(word)
+        }
+        if (noteParts.size === 0) {
+            return true
         }
     })
     if (noteParts.size === 0) {
