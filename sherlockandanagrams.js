@@ -31,11 +31,13 @@ const combinaciones = (a) => {
 */
 const calcularSubventanas = (ventanaMasGrande, longitud, anagramas) => {
     let subVentana = ventanaMasGrande;
-    for (let index = longitud; index > 1; index--) {
+    for (let index = longitud - 1; index >= 1; index--) {
         subVentana = subVentana.substring(1)
-        const coordenadas = anagramas.get(subVentana) || []
-        coordenadas.push({ x: longitud-index+1, y: longitud })
-        anagramas.set(subVentana, coordenadas)
+        if (subVentana.length > 1) {
+            const coordenadas = anagramas.get(subVentana) || []
+            coordenadas.push({ x: index, y: longitud })
+            anagramas.set(subVentana, coordenadas)
+        }
     }
 }
 function sherlockAndAnagrams(s) {
@@ -49,7 +51,7 @@ function sherlockAndAnagrams(s) {
         anagrams.set(s[index], reps)
         if (index < s.length - 1) {
             window += s[index]
-            if(index>0){
+            if (index > 0) {
                 const reps = anagrams.get(window) || [];
                 reps.push({ x: 0, y: index })
                 anagrams.set(window, reps)
