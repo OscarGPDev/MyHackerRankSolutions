@@ -40,33 +40,71 @@ const calcularSubventanas = (ventanaMasGrande, longitud, anagramas) => {
         }
     }
 }
-function sherlockAndAnagrams(s) {
-    const anagrams = new Map()
-
-    let window = ""
-    let reversedWindow = ""
-    for (let index = 0; index < s.length; index++) {
-        const reps = anagrams.get(s[index]) || [];
-        reps.push({ x: index, y: index })
-        anagrams.set(s[index], reps)
-        if (index < s.length - 1) {
-            window += s[index]
-            if (index > 0) {
-                const reps = anagrams.get(window) || [];
-                reps.push({ x: 0, y: index })
-                anagrams.set(window, reps)
-                calcularSubventanas(window, index, anagrams)
-            }
-        } else {
-            window += s[index]
-            window = window.substring(1)
-            const reps = anagrams.get(window) || [];
-            reps.push({ x: 1, y: index })
-            anagrams.set(window, reps)
-            calcularSubventanas(window, index, anagrams)
+const calcularSubventanasInversa = (ventanaMasGrande, longitud, anagramas) => {
+    let subVentana = ventanaMasGrande;
+    for (let index = longitud - 1; index >= 1; index--) {
+        subVentana = subVentana.substring(1)
+        if (subVentana.length > 1) {
+            const coordenadas = anagramas.get(subVentana) || []
+            // Razonando indices :s 
+            coordenadas.push({ x: index, y: longitud })
+            anagramas.set(subVentana, coordenadas)
         }
     }
-    console.log(anagrams)
+}
+function sherlockAndAnagrams(s) {
+    const windows = new Map()
+    const reversedWindows = new Map()
+    const anagrams = new Map()
+    let window = ""
+    let reversedWindow = ""
+    const longitudS = s.length
+    for (let index = 0; index < longitudS; index++) {
+        const simbolo = s[index]
+        const reps = windows.get(simbolo) || []
+        reps.push({ x: index, y: index })
+        windows.set(simbolo, reps)
+        window += simbolo
+        reversedWindow = simbolo + reversedWindow
+        if (index < longitudS - 1) {
+            if (index > 0) {
+                const reps = windows.get(window) || [];
+                reps.push({ x: 0, y: index })
+                windows.set(window, reps)
+                calcularSubventanas(window, index, windows)
+            }
+        } else {
+            const lastWindow = window.substring(1)
+            const reps = windows.get(lastWindow) || [];
+            reps.push({ x: 1, y: index })
+            windows.set(lastWindow, reps)
+            calcularSubventanas(lastWindow, index, windows)
+        }
+    }
+    window = ""
+    for (index = longitudS - 1; index >= 0; index--) {
+        const simbolo = s[index]
+        window += simbolo
+        const reps = reversedWindows.get(simbolo) || []
+        reps.push({ x: index, y: index })
+        reversedWindows.set(simbolo, reps)
+        if (index > 0) {
+            if (index < longitudS-1) {
+                const reps = reversedWindows.get(window) || [];
+                reps.push({ x: index, y: longitudS-1 })
+                reversedWindows.set(window, reps)
+                calcularSubventanas(window, window.length, reversedWindows)
+            }
+        } else {
+            const lastWindow = window.substring(1)
+            const reps = reversedWindows.get(lastWindow) || [];
+            reps.push({ x: index, y: longitudS-2 })
+            reversedWindows.set(lastWindow, reps)
+            calcularSubventanas(lastWindow, window.length, reversedWindows)
+        }
+    }
+    console.log(window)
+    console.log(reversedWindows)
     // console.log(combinaciones(anagrams.values()[0]))
 }
 sherlockAndAnagrams("abba")
