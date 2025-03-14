@@ -4,30 +4,34 @@
  * The function is expected to return an INTEGER.
  * The function accepts STRING s as parameter.
  */
-/**
- * @param {string} s string to check for anagrams
-*/
-const reverseString = (stringToReverse) => {
-    let reversedString = ""
-    for (let index = stringToReverse.length - 1; index >= 0; index--) {
-        reversedString += stringToReverse[index];
+class Coordenadas {
+    constructor(x, y) {
+        this.x = x
+        this.y = y
     }
-    return reversedString
+    checkMatch(coordenadas) {
+        return this.x === coordenadas.x && this.y === coordenadas.y
+    }
 }
-const combinaciones = (a) => {
-    let factorial1 = 1
-    for (let index = 1; index <= a.length; index++) {
-        factorial1 *= index
+class ParCoordenadas {
+    /**
+     * @param {Coordenadas} par1 
+     * @param {Coordenadas} par2 
+    */
+    constructor(par1, par2) {
+        this.par1 = par1
+        this.par2 = par2
     }
-    let factorial2 = 1
-    for (let index = 1; index <= a.length - 2; index++) {
-        factorial2 *= index
+    /**
+     * check if a tuple of coordinates is equivalent to the ones stored
+    */
+    checkMatch(par1, par2) {
+        return (this.par1.checkMatch(par1) && this.par2.checkMatch(par2)) || (this.par1.checkMatch(par2) && this.par2.checkMatch(par1))
     }
-    return factorial1 / (2 * factorial2)
 }
 /**
  * 
- * @param {Map<string,Array<object>>} anagramas objeto Map que tiene las cadenas que queremos verificar si es anagrama
+ * @param {Map<string,Array<Coordenadas>>} anagramas objeto Map que tiene las cadenas que queremos verificar si es anagrama
 */
 const calcularSubventanas = (ventanaMasGrande, longitud, anagramas) => {
     let subVentana = ventanaMasGrande;
@@ -35,78 +39,143 @@ const calcularSubventanas = (ventanaMasGrande, longitud, anagramas) => {
         subVentana = subVentana.substring(1)
         if (subVentana.length > 1) {
             const coordenadas = anagramas.get(subVentana) || []
-            coordenadas.push({ x: index, y: longitud })
+            coordenadas.push(new Coordenadas(index, longitud))
             anagramas.set(subVentana, coordenadas)
         }
     }
 }
-const calcularSubventanasInversa = (ventanaMasGrande, longitud, anagramas) => {
+/**
+ * @param {Map<string,Array<ParCoordenadas>>} anagrams
+*/
+const calcularSubventanasInversa = (ventanaMasGrande, startIndex, endIndex, windows, anagrams) => {
     let subVentana = ventanaMasGrande;
+    const longitud = ventanaMasGrande.length
+    let leftIndex = startIndex
+    let rightIndex = endIndex
+    let resultado = 0
     for (let index = longitud - 1; index >= 1; index--) {
         subVentana = subVentana.substring(1)
+        rightIndex--
+        const coordenadasIteracion = new Coordenadas(leftIndex, rightIndex)
         if (subVentana.length > 1) {
-            const coordenadas = anagramas.get(subVentana) || []
-            // Razonando indices :s 
-            coordenadas.push({ x: index, y: longitud })
-            anagramas.set(subVentana, coordenadas)
+            const matches = windows.get(subVentana)
+            if (matches) {
+                resultado += matches.reduce((matches, el) => {
+                    if (!el.checkMatch(coordenadasIteracion)) {
+                        const uniqueAnagrams = anagrams.get(subVentana.length) || []
+                        if (!uniqueAnagrams.find(parUnico => parUnico.checkMatch(el, coordenadasIteracion))) {
+                            uniqueAnagrams.push(new ParCoordenadas(el, coordenadasIteracion))
+                            anagrams.set(subVentana.length, uniqueAnagrams)
+                            matches++
+                        }
+                    }
+                    return matches
+                }, 0)
+            }
+
         }
     }
+    return resultado
 }
 function sherlockAndAnagrams(s) {
     const windows = new Map()
-    const reversedWindows = new Map()
+
     const anagrams = new Map()
     let window = ""
-    let reversedWindow = ""
+
     const longitudS = s.length
+    //creacion de las cadenas que pueden ser anagramas
     for (let index = 0; index < longitudS; index++) {
         const simbolo = s[index]
         const reps = windows.get(simbolo) || []
-        reps.push({ x: index, y: index })
+        reps.push(new Coordenadas(index, index))
         windows.set(simbolo, reps)
         window += simbolo
-        reversedWindow = simbolo + reversedWindow
+
         if (index < longitudS - 1) {
             if (index > 0) {
                 const reps = windows.get(window) || [];
-                reps.push({ x: 0, y: index })
+                reps.push(new Coordenadas(0, index))
                 windows.set(window, reps)
                 calcularSubventanas(window, index, windows)
             }
         } else {
             const lastWindow = window.substring(1)
             const reps = windows.get(lastWindow) || [];
-            reps.push({ x: 1, y: index })
+            reps.push(new Coordenadas(1, index))
             windows.set(lastWindow, reps)
             calcularSubventanas(lastWindow, index, windows)
         }
     }
+    //busqueda de los anagramas
     window = ""
+    const lastIndex = longitudS - 1
+    let result = 0
     for (index = longitudS - 1; index >= 0; index--) {
         const simbolo = s[index]
         window += simbolo
-        const reps = reversedWindows.get(simbolo) || []
-        reps.push({ x: index, y: index })
-        reversedWindows.set(simbolo, reps)
+        const coordenadasSimbolo = new Coordenadas(index, index)
+        const reps = windows.get(simbolo) || []
+        if (reps.length > 0) {
+            const matches = windows.get(simbolo)
+            if (matches) {
+                result += matches.reduce((matches, el) => {
+                    if (!el.checkMatch(coordenadasSimbolo)) {
+                        const uniqueAnagrams = anagrams.get(1) || []
+                        if (!uniqueAnagrams.find(parUnico => parUnico.checkMatch(el, coordenadasSimbolo))) {
+                            uniqueAnagrams.push(new ParCoordenadas(el, coordenadasSimbolo))
+                            anagrams.set(1, uniqueAnagrams)
+                            matches++
+                        }
+                    }
+                    return matches
+                }, 0)
+            }
+        }
         if (index > 0) {
-            if (index < longitudS-1) {
-                const reps = reversedWindows.get(window) || [];
-                reps.push({ x: index, y: longitudS-1 })
-                reversedWindows.set(window, reps)
-                calcularSubventanas(window, window.length, reversedWindows)
+            if (index < lastIndex) {
+                const matches = windows.get(window)
+                const coordenadasVentana = new Coordenadas(index, lastIndex)
+                if (matches) {
+                    result += matches.reduce((matches, el) => {
+
+                        if (!el.checkMatch(coordenadasVentana)) {
+                            const uniqueAnagrams = anagrams.get(window.length) || []
+                            if (!uniqueAnagrams.find(parUnico => parUnico.checkMatch(el, coordenadasVentana))) {
+                                uniqueAnagrams.push(new ParCoordenadas(el, coordenadasVentana))
+                                anagrams.set(window.length, uniqueAnagrams)
+                                matches++
+                            }
+                        }
+                        return matches
+                    }, 0)
+                }
+
+                result += calcularSubventanasInversa(window, index, lastIndex, windows, anagrams)
             }
         } else {
             const lastWindow = window.substring(1)
-            const reps = reversedWindows.get(lastWindow) || [];
-            reps.push({ x: index, y: longitudS-2 })
-            reversedWindows.set(lastWindow, reps)
-            calcularSubventanas(lastWindow, window.length, reversedWindows)
+            const matches = windows.get(lastWindow)
+            const coordenadasVentana = new Coordenadas(index, lastIndex - 1)
+            if (matches) {
+                result += matches.reduce((matches, el) => {
+                    const uniqueAnagrams = anagrams.get(lastWindow.length) || []
+                    if (!el.checkMatch(coordenadasVentana)) {
+                        if (!uniqueAnagrams.find(parUnico => parUnico.checkMatch(el, coordenadasVentana))) {
+                            uniqueAnagrams.push(new ParCoordenadas(el, coordenadasVentana))
+                            anagrams.set(lastWindow.length, uniqueAnagrams)
+                            matches++
+                        }
+                    }
+                    return matches
+                }, 0)
+            }
+
+            result += calcularSubventanasInversa(lastWindow, index, lastIndex - 1, windows, anagrams)
         }
     }
-    console.log(window)
-    console.log(reversedWindows)
-    // console.log(combinaciones(anagrams.values()[0]))
+    return result
 }
-sherlockAndAnagrams("abba")
-sherlockAndAnagrams("kkkk")
-sherlockAndAnagrams("abcdefghi")
+// console.log(sherlockAndAnagrams("abba"));
+// console.log(sherlockAndAnagrams("kkkk"));
+console.log( sherlockAndAnagrams("cdcd"));
