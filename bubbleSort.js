@@ -20,5 +20,3 @@ function countSwaps(a) {
     console.log(`First Element: ${a[0]}`)
     console.log(`Last Element: ${a[n - 1]}`)
 }
-countSwaps([1, 2, 3])
-countSwaps([3, 2, 1])
