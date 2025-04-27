@@ -9,7 +9,6 @@ function largestRectangle(h) {
     // Write your code here
     let result = 0
     const solidAreas = new Map()
-    const finalAreas = new Set()
     h.forEach((building, buildingIndex) => {
         solidAreas.set(buildingIndex, [{ height: building, length: 1, buildingIndex }])
         solidAreas.forEach((solidAreasByIndex, key) => {
@@ -38,8 +37,9 @@ function largestRectangle(h) {
     })
     solidAreas.forEach(solidAreasByIndex => {
         solidAreasByIndex.forEach(solidArea => {
-            if (result < solidArea.height * solidArea.length) {
-                result = solidArea.height * solidArea.length
+            const area = solidArea.height * solidArea.length
+            if (result < area) {
+                result = area
             }
         })
 
