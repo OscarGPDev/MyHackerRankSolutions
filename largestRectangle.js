@@ -10,13 +10,14 @@ function largestRectangle(h) {
     let result = 0
     const solidAreas = new Map()
     h.forEach((building, buildingIndex) => {
-        solidAreas.set(buildingIndex, [{ height: building, length: 1, buildingIndex }])
+        solidAreas.set(buildingIndex, [{ height: building, length: 1, processesedIndex: buildingIndex, buildingIndex, continue: true }])
         solidAreas.forEach((solidAreasByIndex, key) => {
             if (key !== buildingIndex) {
                 solidAreasByIndex.forEach(solidArea => {
                     if (
                         building >= solidArea.height &&
-                        buildingIndex != solidArea.buildingIndex
+                        buildingIndex != solidArea.buildingIndex &&
+                        solidArea.continue
                     ) {
                         solidArea.length++
                     }
@@ -25,7 +26,8 @@ function largestRectangle(h) {
                         buildingIndex != solidArea.buildingIndex
                     ) {
                         const existingArea = solidAreasByIndex.find(sa => sa.height === building)
-                        if (existingArea) {
+                        solidArea.continue = false
+                        if (existingArea && solidArea.processesedIndex !== buildingIndex) {
                             existingArea.length++
                         } else {
                             solidAreasByIndex.push({ ...solidArea, height: building, length: buildingIndex - solidArea.buildingIndex + 1 })
@@ -51,3 +53,4 @@ function largestRectangle(h) {
 console.log(largestRectangle([1, 2, 3, 4, 5]))
 console.log(largestRectangle([1, 3, 5, 9, 11]))
 console.log(largestRectangle([11, 11, 10, 10, 10]))
+console.log(largestRectangle([8979, 4570, 6436, 5083, 7780, 3269, 5400, 7579, 2324, 2116]))
