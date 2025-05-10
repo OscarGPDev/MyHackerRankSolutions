@@ -13,4 +13,4 @@ function catAndMouse(x, y, z) {
 
     return result
 }
-console.log(catAndMouse(2, 5, 4))
+module.exports = catAndMouse
