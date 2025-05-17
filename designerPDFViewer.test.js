@@ -1,4 +1,4 @@
-const designerPdfViewer = require('./designerPdfViewer');
+const designerPdfViewer = require('./designerPDFViewer');
 
 test('designerPdfViewer (designerPdfViewer(h, "torn")', () => {
     expect(designerPdfViewer([1, 3, 1, 3, 1, 4, 1, 3, 2, 5, 5, 5, 5, 1, 1, 5, 5, 1, 5, 2, 5, 5, 5, 5, 5, 5],
