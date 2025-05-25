@@ -1,6 +1,6 @@
 const appendAndDelete = require('./appendAndDelete');
 
-test('designerPdfViewer("abc", "dcf", 6)', () => {
+test('appendAndDelete("abc", "dcf", 6)', () => {
     expect(appendAndDelete("abc", "dcf", 6)).toBe("YES");
 });
 
